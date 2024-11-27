@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado de Psicologia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .question p {
+            margin: 0 0 10px;
+        }
+        .results {
+            display: none;
+            margin-top: 20px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulado de Psicologia</h1>
+        <form id="quiz-form">
+            <div id="questions-container"></div>
+            <button type="submit" class="btn">Enviar Respostas</button>
+        </form>
+        <div class="results" id="results-container">
+            <h2>Resultados</h2>
+            <ul id="results-list"></ul>
+            <p>Total de Acertos: <span id="score"></span> de 30</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // Aqui estarão as 60 questões pré-definidas.
+{ question: "Qual princípio garante o respeito à dignidade humana?", options: ["Sigilo absoluto", "Respeito à autonomia", "Atualização profissional", "Consentimento informado"], correct: 1 },
+    { question: "O que caracteriza a responsabilidade profissional na psicologia?", options: ["Estabelecer laços pessoais com o cliente", "Divulgar informações pessoais para terceiros", "Responder pelas consequências de suas intervenções", "Recusar acompanhamento contínuo"], correct: 2 },
+    { question: "A autonomia do cliente deve ser respeitada em qual situação?", options: ["Somente em decisões críticas", "Sempre, desde que não viole outros direitos", "Apenas em contextos judiciais", "Quando o profissional considera necessário"], correct: 1 },
+    { question: "Qual é a base para o sigilo profissional?", options: ["Proteger o cliente de acusações", "Garantir a privacidade das informações", "Evitar repercussões legais para o psicólogo", "Manter a ética na pesquisa"], correct: 1 },
+    { question: "Qual prática reforça a responsabilidade na psicologia?", options: ["Atuar em qualquer área disponível", "Garantir resultados rápidos", "Reconhecer os limites da sua competência", "Evitar atualizações frequentes"], correct: 2 },
+    { question: "O que define o respeito à dignidade humana?", options: ["Focar apenas em necessidades físicas", "Promover direitos e autonomia", "Priorizar aspectos legais", "Tratar todos igualmente sem distinções"], correct: 1 },
+    { question: "Quando a responsabilidade do psicólogo é mais evidente?", options: ["Em emergências clínicas", "Ao delegar tarefas", "Na condução de suas ações e decisões", "Em casos judiciais"], correct: 2 },
+    { question: "Respeitar a autonomia do cliente implica em:", options: ["Aceitar todas as suas decisões sem questionar", "Encaminhar o cliente para outro profissional se discordar", "Orientar e apoiar o cliente para escolhas conscientes", "Manter o cliente sob supervisão constante"], correct: 2 },
+    { question: "Por que o sigilo é essencial na psicologia?", options: ["Evita conflitos judiciais", "Preserva a confiança no vínculo terapêutico", "Facilita o acesso a informações pessoais", "Permite diagnósticos precisos"], correct: 1 },
+    { question: "Como o psicólogo demonstra responsabilidade ética?", options: ["Adotando técnicas comprovadas e apropriadas", "Mantendo distância emocional de todos os clientes", "Garantindo resultados rápidos e eficientes", "Evitando atender casos desafiadores"], correct: 0 },
+
+    // Relação com o Cliente (10 questões)
+    { question: "O consentimento informado é fundamental para:", options: ["Decisões conjuntas com a família", "Realização de intervenções psicológicas", "Divulgação de dados pessoais", "Escolha de métodos terapêuticos pelo psicólogo"], correct: 1 },
+    { question: "Como deve ser garantida a imparcialidade no atendimento?", options: ["Adotando abordagem padrão para todos os casos", "Adaptando intervenções às preferências pessoais do cliente", "Tratando cada cliente de forma justa e ética", "Permitir que o cliente conduza todas as sessões"], correct: 2 },
+    { question: "Explorar financeiramente um cliente é:", options: ["Aceitável em casos de alta renda", "Permitido mediante acordo", "Considerado antiético e proibido", "Recomendado para evitar dívidas"], correct: 2 },
+    { question: "Como o consentimento informado deve ser obtido?", options: ["Apenas verbalmente", "De forma clara e documentada", "Somente quando solicitado pelo cliente", "De maneira implícita durante o atendimento"], correct: 1 },
+    { question: "O que é imprescindível na relação psicólogo-cliente?", options: ["Garantir cura imediata", "Estabelecer limites claros", "Realizar diagnósticos rápidos", "Permitir flexibilidade total ao cliente"], correct: 1 },
+    { question: "Como lidar com conflitos de interesse com o cliente?", options: ["Ignorá-los e continuar o atendimento", "Ajustar as intervenções ao contexto", "Comunicar ao cliente e encaminhá-lo", "Estabelecer acordos informais"], correct: 2 },
+    { question: "A imparcialidade no atendimento significa:", options: ["Adaptar-se às expectativas do cliente", "Manter uma postura ética em todos os casos", "Focar nas áreas de maior rentabilidade", "Recusar atendimentos que exigem dedicação"], correct: 1 },
+    { question: "Por que o consentimento informado é necessário?", options: ["Garante a legalidade do atendimento", "Protege o psicólogo contra reclamações", "Promove decisões compartilhadas e informadas", "Evita divergências familiares"], correct: 2 },
+    { question: "A exploração financeira ocorre quando:", options: ["Os preços são ajustados à complexidade do caso", "Valores são cobrados sem justificativa ou ética", "Os serviços são pré-pagos", "O cliente concorda com o valor"], correct: 1 },
+    { question: "O que o psicólogo deve evitar na relação com o cliente?", options: ["Manter sigilo absoluto", "Estabelecer vínculos terapêuticos", "Intervir sem consentimento explícito", "Reconhecer limites pessoais"], correct: 2 },
+
+    // Sigilo Profissional (10 questões)
+    { question: "Quando o sigilo profissional pode ser quebrado?", options: ["Ao receber uma ordem judicial", "Sempre que solicitado pela família", "Em casos de risco ao cliente ou a terceiros", "Nunca, sob nenhuma circunstância"], correct: 2 },
+    { question: "O que deve ser feito diante de um caso de abuso?", options: ["Manter sigilo total", "Denunciar às autoridades competentes", "Divulgar informações para a mídia", "Consultar outros profissionais antes de agir"], correct: 1 },
+    { question: "Como lidar com risco de suicídio?", options: ["Encerrar o atendimento", "Apoiar e encaminhar para serviços de emergência", "Notificar familiares imediatamente", "Evitar intervenções para não pressionar o cliente"], correct: 1 },
+    { question: "Que ação é esperada em casos de risco de homicídio?", options: ["Orientar o cliente a buscar ajuda jurídica", "Intervir diretamente com a vítima", "Comunicar autoridades responsáveis", "Evitar qualquer comunicação externa"], correct: 2 },
+    { question: "O que constitui uma violação do sigilo profissional?", options: ["Comunicar autoridades sobre crimes confessados", "Compartilhar informações com a equipe multidisciplinar", "Divulgar dados do cliente sem permissão", "Quebrar o sigilo em caso de perigo"], correct: 2 },
+    { question: "Como o sigilo pode ser garantido em registros?", options: ["Utilizando apenas sistemas digitais", "Limitando o acesso a pessoas autorizadas", "Nunca registrando dados confidenciais", "Solicitando senha para o cliente"], correct: 1 },
+    { question: "Quando o sigilo pode ser quebrado sem consentimento?", options: ["Em qualquer questão familiar", "Ao ser questionado em tribunais", "Para proteger o cliente ou terceiros de riscos graves", "A pedido de outro profissional"], correct: 2 },
+    { question: "A divulgação de dados terapêuticos pode ocorrer:", options: ["Somente com autorização do cliente ou em situações previstas por lei", "Sempre que solicitado por familiares", "Se o psicólogo considerar irrelevante", "Quando o cliente já deixou o acompanhamento"], correct: 0 },
+    { question: "Em caso de risco à vida, o psicólogo deve:", options: ["Romper o sigilo e notificar autoridades competentes", "Aguardar o cliente procurar ajuda", "Evitar registros formais", "Comunicar apenas colegas próximos"], correct: 0 },
+    { question: "O sigilo é violado ao:", options: ["Informar familiares sobre sessões sem consentimento", "Consultar profissionais especializados com autorização do cliente", "Registrar casos de risco no prontuário", "Solicitar informações complementares de outros serviços"], correct: 0 }
+            // Adicionar mais 58 questões aqui.
+        ];
+
+        // Função para embaralhar array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Selecionar 30 perguntas aleatórias
+        const selectedQuestions = shuffle(questions).slice(0, 30);
+
+        // Renderizar perguntas no formulário
+        const questionsContainer = document.getElementById("questions-container");
+        selectedQuestions.forEach((q, index) => {
+            const questionDiv = document.createElement("div");
+            questionDiv.classList.add("question");
+            questionDiv.innerHTML = `
+                <p>${index + 1}. ${q.question}</p>
+                ${q.options.map((option, i) => `
+                    <label>
+                        <input type="radio" name="question${index}" value="${i}">
+                        ${option}
+                    </label><br>`).join('')}
+            `;
+            questionsContainer.appendChild(questionDiv);
+        });
+
+        // Processar respostas e exibir resultados
+        document.getElementById("quiz-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultsContainer = document.getElementById("results-container");
+            const resultsList = document.getElementById("results-list");
+            let score = 0;
+
+            resultsList.innerHTML = "";
+            selectedQuestions.forEach((q, index) => {
+                const userAnswer = formData.get(`question${index}`);
+                const isCorrect = parseInt(userAnswer) === q.correct;
+                if (isCorrect) score++;
+                const resultItem = document.createElement("li");
+                resultItem.innerHTML = `
+                    <b>${index + 1}. ${q.question}</b><br>
+                    Sua resposta: <span class="${isCorrect ? 'correct' : 'incorrect'}">${q.options[userAnswer] || "Não respondido"}</span><br>
+                    Resposta correta: <span class="correct">${q.options[q.correct]}</span>
+                `;
+                resultsList.appendChild(resultItem);
+            });
+
+            document.getElementById("score").textContent = score;
+            resultsContainer.style.display = "block";
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+    </script>
+</body>
+</html>
